@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@keyframes panelFloatA {
+  0%, 100% {
+    transform: translate3d(0, 0px, 0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(0, -3px, 0);
+    opacity: 0.78;
+  }
+}
+
+@keyframes panelFloatB {
+  0%, 100% {
+    transform: translate3d(0, 2px, 0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate3d(0, -2px, 0);
+    opacity: 0.75;
+  }
+}
+
+@keyframes panelFloatC {
+  0%, 100% {
+    transform: translate3d(0, -2px, 0);
+    opacity: 0.42;
+  }
+  50% {
+    transform: translate3d(0, 2px, 0);
+    opacity: 0.76;
+  }
+}
+
+@keyframes orbPulseColor {
+  0%, 100% {
+    opacity: 0.48;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  33% {
+    opacity: 0.72;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+  66% {
+    opacity: 0.62;
+    transform: translate(-50%, -50%) scale(1.01);
+  }
+}
+
+@keyframes orbRotateSlow {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes orbRotateReverse {
+  0% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+}
+
+@keyframes timelineScrub {
+  0%, 100% {
+    transform: translate3d(0%, 0, 0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(220%, 0, 0);
+    opacity: 0.75;
+  }
+}
+
+.animate-panel-float-a {
+  animation: panelFloatA 6.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-panel-float-b {
+  animation: panelFloatB 7.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-panel-float-c {
+  animation: panelFloatC 8.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-orb-pulse-color {
+  animation: orbPulseColor 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-orb-rotate-slow {
+  animation: orbRotateSlow 22s linear infinite;
+  will-change: transform;
+}
+
+.animate-orb-rotate-reverse {
+  animation: orbRotateReverse 28s linear infinite;
+  will-change: transform;
+}
+
+.animate-timeline-scrub {
+  animation: timelineScrub 9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-panel-float-a,
+  .animate-panel-float-b,
+  .animate-panel-float-c,
+  .animate-orb-pulse-color,
+  .animate-orb-rotate-slow,
+  .animate-orb-rotate-reverse,
+  .animate-timeline-scrub {
+    animation: none !important;
+  }
+}
