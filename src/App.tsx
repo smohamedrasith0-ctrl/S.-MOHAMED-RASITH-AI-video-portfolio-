@@ -132,14 +132,45 @@ export default function App() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
-  // Load initial data from Supabase
+  // Load initial data from Supabase with localStorage backup
   useEffect(() => {
+    // Load local cache first for instant display
+    try {
+      const cached = localStorage.getItem('nexus_portfolio_state');
+      if (cached) {
+        const saved = JSON.parse(cached);
+        if (saved.settings) {
+          setSettings(saved.settings);
+          setSiteNameInput(saved.settings.site_name || DEFAULT_SETTINGS.site_name);
+          setOwnerNameInput(saved.settings.owner_name || DEFAULT_SETTINGS.owner_name);
+          setOwnerTitleInput(saved.settings.owner_title || DEFAULT_SETTINGS.owner_title);
+          setOwnerBioInput(saved.settings.owner_bio || DEFAULT_SETTINGS.owner_bio);
+          setWhatsappInput(saved.settings.whatsapp || DEFAULT_SETTINGS.whatsapp);
+          setInstagramInput(saved.settings.instagram || DEFAULT_SETTINGS.instagram);
+          setEmailInput(saved.settings.email || DEFAULT_SETTINGS.email);
+          document.title = `${saved.settings.site_name || 'Nexus'} — Portfolio`;
+        }
+        if (Array.isArray(saved.videos)) setVideos(saved.videos);
+        if (Array.isArray(saved.deletedVideos)) setDeletedVideos(saved.deletedVideos);
+        if (saved.adminPassword) setCustomAdminPassword(saved.adminPassword);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
     loadDataFromSupabase();
   }, []);
 
   const loadDataFromSupabase = async () => {
     try {
-      const { data, error } = await supabase.from('website_content').select('data').eq('id', 'main').single();
+      if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('placeholder')) {
+        return;
+      }
+      const { data, error } = await supabase.from('website_content').select('data').eq('id', 'main').maybeSingle();
+      if (error) {
+        console.warn('Supabase load notice:', error.message);
+        return;
+      }
       if (data && data.data) {
         const saved = data.data;
         if (saved.settings) {
@@ -153,22 +184,15 @@ export default function App() {
           setEmailInput(saved.settings.email || DEFAULT_SETTINGS.email);
           document.title = `${saved.settings.site_name || 'Nexus'} — Portfolio`;
         }
-        if (saved.videos) setVideos(saved.videos);
-        if (saved.deletedVideos) setDeletedVideos(saved.deletedVideos);
+        if (Array.isArray(saved.videos)) setVideos(saved.videos);
+        if (Array.isArray(saved.deletedVideos)) setDeletedVideos(saved.deletedVideos);
         if (saved.adminPassword) setCustomAdminPassword(saved.adminPassword);
-      } else {
-        // Initialize default
-        setSiteNameInput(DEFAULT_SETTINGS.site_name);
-        setOwnerNameInput(DEFAULT_SETTINGS.owner_name);
-        setOwnerTitleInput(DEFAULT_SETTINGS.owner_title);
-        setOwnerBioInput(DEFAULT_SETTINGS.owner_bio);
-        setWhatsappInput(DEFAULT_SETTINGS.whatsapp);
-        setInstagramInput(DEFAULT_SETTINGS.instagram);
-        setEmailInput(DEFAULT_SETTINGS.email);
-        await saveDataToSupabase(DEFAULT_SETTINGS, [], []);
+
+        // Update local cache
+        localStorage.setItem('nexus_portfolio_state', JSON.stringify(saved));
       }
     } catch (e) {
-      console.error('Error loading from Supabase:', e);
+      console.warn('Supabase fetch skipped (offline or unconfigured):', e);
     }
   };
 
@@ -180,9 +204,14 @@ export default function App() {
         deletedVideos: newDeleted,
         adminPassword: newPass || customAdminPassword
       };
+      localStorage.setItem('nexus_portfolio_state', JSON.stringify(payload));
+
+      if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('placeholder')) {
+        return;
+      }
       await supabase.from('website_content').upsert({ id: 'main', data: payload, updated_at: new Date() });
     } catch (e) {
-      console.error('Error saving to Supabase:', e);
+      console.warn('Supabase save skipped (offline or unconfigured):', e);
     }
   };
 
