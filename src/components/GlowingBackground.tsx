@@ -171,10 +171,12 @@ export const GlowingBackground: React.FC = () => {
       const flowProgress = (elapsed * 0.22) % 1;
       const segTotal = flowNodes.length - 1;
       const scaled = flowProgress * segTotal;
-      const idx = Math.min(Math.floor(scaled), segTotal - 1);
+      const idx = Math.min(Math.max(0, Math.floor(scaled)), segTotal - 1);
       const frac = scaled - idx;
-      const px = flowNodes[idx].x + (flowNodes[idx + 1].x - flowNodes[idx].x) * frac;
-      const py = flowNodes[idx].y + (flowNodes[idx + 1].y - flowNodes[idx].y) * frac;
+      const n1 = flowNodes[idx] || flowNodes[0];
+      const n2 = flowNodes[idx + 1] || flowNodes[flowNodes.length - 1];
+      const px = n1.x + (n2.x - n1.x) * frac;
+      const py = n1.y + (n2.y - n1.y) * frac;
 
       const pulseR = Math.max(10, width * 0.015);
       const nodePulse = ctx.createRadialGradient(px, py, 0, px, py, pulseR);
