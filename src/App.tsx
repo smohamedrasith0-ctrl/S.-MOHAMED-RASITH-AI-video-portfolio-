@@ -62,7 +62,7 @@ interface Video {
 }
 
 const DEFAULT_SETTINGS: SettingsData = {
-  site_name: 'Nexus Portfolio',
+  site_name: 'AI VIDEO PORTFOLIO',
   owner_name: 'Alex Morgan',
   owner_title: 'Senior Film Director & Creative Technologist',
   owner_bio: 'Crafting immersive visual stories, cinematic motion pictures, and high-performance digital experiences.',
@@ -134,6 +134,20 @@ export default function App() {
 
   // Load initial data from Supabase with localStorage backup
   useEffect(() => {
+    // Check if URL is /admin or #admin
+    if (window.location.pathname === '/admin' || window.location.hash === '#admin') {
+      setIsAdminLoginOpen(true);
+    }
+
+    // Keyboard shortcut to open admin login: Ctrl + Shift + A
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        setIsAdminLoginOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
     // Load local cache first for instant display
     try {
       const cached = localStorage.getItem('nexus_portfolio_state');
@@ -239,15 +253,23 @@ export default function App() {
       setIsAdminLoginOpen(false);
       setAdminPasswordInput('');
       setCurrentView('admin');
+      window.history.pushState({}, '', '/admin');
       showToast('Successfully logged in as Administrator');
     } else {
       setAdminLoginError('Invalid admin password');
     }
   };
 
+  const toggleView = () => {
+    const next = currentView === 'public' ? 'admin' : 'public';
+    setCurrentView(next);
+    window.history.pushState({}, '', next === 'admin' ? '/admin' : '/');
+  };
+
   const handleAdminLogout = () => {
     setIsAdminAuthenticated(false);
     setCurrentView('public');
+    window.history.pushState({}, '', '/');
     showToast('Logged out successfully');
   };
 
@@ -491,7 +513,7 @@ export default function App() {
             <a href="#contact" onClick={() => setCurrentView('public')} className="hover:text-white transition-colors whitespace-nowrap shrink-0">Contact</a>
             {isAdminAuthenticated && (
               <button
-                onClick={() => setCurrentView(currentView === 'public' ? 'admin' : 'public')}
+                onClick={toggleView}
                 className="text-purple-400 hover:text-purple-300 transition-colors whitespace-nowrap shrink-0 font-semibold"
               >
                 {currentView === 'public' ? 'Admin Dashboard' : 'View Public Site'}
@@ -503,7 +525,7 @@ export default function App() {
             {isAdminAuthenticated ? (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setCurrentView(currentView === 'public' ? 'admin' : 'public')}
+                  onClick={toggleView}
                   className="px-4 py-2 text-xs font-semibold text-black bg-purple-400 hover:bg-purple-300 rounded-lg transition-colors whitespace-nowrap shrink-0 shadow"
                 >
                   {currentView === 'public' ? 'Dashboard' : 'Public Site'}
@@ -517,15 +539,7 @@ export default function App() {
                   <span className="hidden sm:inline">Logout</span>
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => setIsAdminLoginOpen(true)}
-                className="px-4 py-2 text-xs font-medium text-white bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5"
-              >
-                <Lock className="w-3.5 h-3.5 text-purple-400" />
-                <span>Admin Login</span>
-              </button>
-            )}
+            ) : null}
           </div>
         </header>
 
@@ -834,7 +848,7 @@ export default function App() {
 
               <div className="pt-6 border-t border-zinc-800/80">
                 <button
-                  onClick={() => setCurrentView('public')}
+                  onClick={() => { setCurrentView('public'); window.history.pushState({}, '', '/'); }}
                   className="w-full mb-3 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs font-medium transition-colors text-center border border-zinc-800"
                 >
                   View Public Website
@@ -1368,17 +1382,12 @@ create policy "Allow public insert/update access" on website_content for all usi
         <footer className="border-t border-zinc-800/80 px-6 py-12 mt-20 bg-[#06020d]/70 backdrop-blur-md">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-zinc-500">
             <div>
-              © {new Date().getFullYear()} {settings.site_name} ({settings.owner_name}). All rights reserved. (Cloudinary + Supabase ready for Render)
+              2026 AI VIDEO PORTFOLIO (Alex Morgan). All rights reserved
             </div>
             <div className="flex items-center gap-6">
               <a href="#portfolio" onClick={() => setCurrentView('public')} className="hover:text-zinc-300 transition-colors">Portfolio</a>
               <a href="#about" onClick={() => setCurrentView('public')} className="hover:text-zinc-300 transition-colors">About</a>
               <a href="#contact" onClick={() => setCurrentView('public')} className="hover:text-zinc-300 transition-colors">Contact</a>
-              {!isAdminAuthenticated && (
-                <button onClick={() => setIsAdminLoginOpen(true)} className="hover:text-purple-400 transition-colors">
-                  Admin Portal
-                </button>
-              )}
             </div>
           </div>
         </footer>
