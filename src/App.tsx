@@ -1382,7 +1382,7 @@ create policy "Allow public insert/update access" on website_content for all usi
         <footer className="border-t border-zinc-800/80 px-6 py-12 mt-20 bg-[#06020d]/70 backdrop-blur-md">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-zinc-500">
             <div>
-              2026 AI VIDEO PORTFOLIO (Alex Morgan). All rights reserved
+              2026 AI VIDEO PORTFOLIO. All rights reserved
             </div>
             <div className="flex items-center gap-6">
               <a href="#portfolio" onClick={() => setCurrentView('public')} className="hover:text-zinc-300 transition-colors">Portfolio</a>
